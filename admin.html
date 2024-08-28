@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar Cômodos e Móveis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            height: 100vh;
+            background-size: cover;
+            background-position: center;
+            transition: background-image 0.5s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 100%;
+        }
+        .item-actions button {
+            margin-right: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Administrar Cômodos e Móveis</h2>
+    <form id="formComodo">
+        <div class="form-group">
+            <label for="comodoInput">Adicionar Cômodo</label>
+            <input type="text" id="comodoInput" class="form-control" placeholder="Nome do Cômodo">
+            <button type="button" class="btn btn-primary mt-2" onclick="adicionarComodo()">Adicionar</button>
+        </div>
+    </form>
+
+    <form id="formMovel" class="mt-4">
+        <div class="form-group">
+            <label for="movelInput">Adicionar Móvel</label>
+            <input type="text" id="movelInput" class="form-control" placeholder="Nome do Móvel">
+            <button type="button" class="btn btn-primary mt-2" onclick="adicionarMovel()">Adicionar</button>
+        </div>
+    </form>
+
+    <h3 class="mt-4">Cômodos</h3>
+    <ul id="comodoList" class="list-group"></ul>
+
+    <h3 class="mt-4">Móveis</h3>
+    <ul id="movelList" class="list-group"></ul>
+
+    <a href="index.html" class="btn btn-secondary w-100 mt-3">Voltar</a>
+</div>
+
+<script>
+    function atualizarLista() {
+        const comodos = JSON.parse(localStorage.getItem('comodos')) || [];
+        const moveis = JSON.parse(localStorage.getItem('moveis')) || [];
+
+        const comodoList = document.getElementById('comodoList');
+        comodoList.innerHTML = '';
+        comodos.forEach(comodo => {
+            comodoList.innerHTML += `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    ${comodo.charAt(0).toUpperCase() + comodo.slice(1).replace('-', ' ')}
+                    <div class="item-actions">
+                        <button class="btn btn-warning btn-sm" onclick="editarComodo('${comodo}')">Editar</button>
+                        <button class="btn btn-danger btn-sm" onclick="removerComodo('${comodo}')">Excluir</button>
+                    </div>
+                </li>
+            `;
+        });
+
+        const movelList = document.getElementById('movelList');
+        movelList.innerHTML = '';
+        moveis.forEach(movel => {
+            movelList.innerHTML += `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    ${movel.charAt(0).toUpperCase() + movel.slice(1).replace('-', ' ')}
+                    <div class="item-actions">
+                        <button class="btn btn-warning btn-sm" onclick="editarMovel('${movel}')">Editar</button>
+                        <button class="btn btn-danger btn-sm" onclick="removerMovel('${movel}')">Excluir</button>
+                    </div>
+                </li>
+            `;
+        });
+    }
+
+    function adicionarComodo() {
+        const comodoInput = document.getElementById('comodoInput');
+        const comodo = comodoInput.value.trim().toLowerCase();
+        if (comodo) {
+            let comodos = JSON.parse(localStorage.getItem('comodos')) || [];
+            if (!comodos.includes(comodo)) {
+                comodos.push(comodo);
+                localStorage.setItem('comodos', JSON.stringify(comodos));
+                comodoInput.value = '';
+                atualizarLista();
+            } else {
+                alert('Cômodo já existe.');
+            }
+        } else {
+            alert('Por favor, insira um nome de cômodo.');
+        }
+    }
+
+    function adicionarMovel() {
+        const movelInput = document.getElementById('movelInput');
+        const movel = movelInput.value.trim().toLowerCase();
+        if (movel) {
+            let moveis = JSON.parse(localStorage.getItem('moveis')) || [];
+            if (!moveis.includes(movel)) {
+                moveis.push(movel);
+                localStorage.setItem('moveis', JSON.stringify(moveis));
+                movelInput.value = '';
+                atualizarLista();
+            } else {
+                alert('Móvel já existe.');
+            }
+        } else {
+            alert('Por favor, insira um nome de móvel.');
+        }
+    }
+
+    function editarComodo(comodo) {
+        const novoNome = prompt('Digite o novo nome para o cômodo:', comodo);
+        if (novoNome) {
+            const comodos = JSON.parse(localStorage.getItem('comodos')) || [];
+            const index = comodos.indexOf(comodo);
+            if (index !== -1) {
+                comodos[index] = novoNome.trim().toLowerCase();
+                localStorage.setItem('comodos', JSON.stringify(comodos));
+                atualizarLista();
+            }
+        }
+    }
+
+    function removerComodo(comodo) {
+        if (confirm('Você tem certeza que deseja excluir este cômodo?')) {
+            let comodos = JSON.parse(localStorage.getItem('comodos')) || [];
+            comodos = comodos.filter(c => c !== comodo);
+            localStorage.setItem('comodos', JSON.stringify(comodos));
+            atualizarLista();
+        }
+    }
+
+    function editarMovel(movel) {
+        const novoNome = prompt('Digite o novo nome para o móvel:', movel);
+        if (novoNome) {
+            const moveis = JSON.parse(localStorage.getItem('moveis')) || [];
+            const index = moveis.indexOf(movel);
+            if (index !== -1) {
+                moveis[index] = novoNome.trim().toLowerCase();
+                localStorage.setItem('moveis', JSON.stringify(moveis));
+                atualizarLista();
+            }
+        }
+    }
+
+    function removerMovel(movel) {
+        if (confirm('Você tem certeza que deseja excluir este móvel?')) {
+            let moveis = JSON.parse(localStorage.getItem('moveis')) || [];
+            moveis = moveis.filter(m => m !== movel);
+            localStorage.setItem('moveis', JSON.stringify(moveis));
+            atualizarLista();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', atualizarLista);
+</script>
+
+</body>
+</html>
